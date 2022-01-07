@@ -1,4 +1,5 @@
 from Ant import Ant
+from Grapher import Grapher
 from const import *
 from tkinter import *
 from Board import Board
@@ -27,6 +28,9 @@ class AntsFlow:
         self.radious = 2
 
         self.ant_list = []
+
+        self.grapher = Grapher()
+
             
     def simulate(self):
         start_time = time.perf_counter()
@@ -44,6 +48,7 @@ class AntsFlow:
                 self.add_new_ant(id_ant)
 
             self.step()
+            self.save_metrics()
             time.sleep(self.delay) # se utiliza para poder controla la velocidad a la que se actualiza el sistema
             self.time += T_STEP
             step += 1
@@ -101,6 +106,11 @@ class AntsFlow:
             #    self.board.change_ant_color(ant_i.id, "blue")
             #    self.board.step()
 
+
+            # buscamos el movimiento que hara la hormiga
+            # actualizamos el vector direccional
+            # aceleramos/frenamos la hormiga
+        
             # is there any ant_j in ant_i's local area?
             near_ants = self.search_near_ants(ant_i)
             if len(near_ants) > 0:
@@ -111,11 +121,12 @@ class AntsFlow:
                 acceleration = ACELERACION*T_STEP
 
             ant_i.accelerate(acceleration)
+
+            # actualizamos ls posicion de la hormiga con su velocidad y vector direccional
             old_pos = ant_i.pos_v
             new_pos = ant_i.update_pos(T_STEP, self.border, 
                 self.max_width - self.border, self.max_height/2 - self.border)
-            move_v = np.array(new_pos) - np.array(old_pos)
-
+            
             # si ha llegado a un punto de inicio, actualizar la preferencia
             if coords_within_circle(self.nest, new_pos, self.radious):
                 ant_i.update_preference(PREF_LEAVE)
@@ -123,11 +134,40 @@ class AntsFlow:
                 ant_i.update_preference(PREF_RETURN)
 
             if self.mode == VISUAL:
+                move_v = np.array(new_pos) - np.array(old_pos) # el movimiento a relizar en la pantalla
                 self.board.update_ant(ant_i, move_v)
                 # self.board.change_ant_color(ant_i.id, "black")
 
+
         if self.mode == VISUAL:
             self.board.step()
+
+    def save_metrics(self):
+        vel_sum_return = 0
+        vel_sum_leave = 0
+        ants_return = 0
+        ants_leave = 0
+        for ant in self.ant_list:
+            if ant.preference == PREF_LEAVE:
+                ants_leave += 1
+                vel_sum_leave += ant.vel
+            else:
+                ants_return += 1
+                vel_sum_return += ant.vel
+
+        if ants_leave > 0:
+            mean_vel_leave = vel_sum_leave/ants_leave
+        else:
+            mean_vel_leave = 0
+
+        if ants_return > 0:
+            mean_vel_return = vel_sum_return/ants_return
+        else:
+            mean_vel_return = 0
+
+        self.grapher.add_mean_vel_leave(mean_vel_leave, self.time)
+        self.grapher.add_mean_vel_return(mean_vel_return, self.time)
+
 
     def search_near_ants(self, ant_i: Ant):
         near_ants = []
@@ -140,13 +180,13 @@ class AntsFlow:
         return near_ants
 
     def eval(self):
-        # TODO
-        pass
+        self.grapher.eval_mean_vel()
         
        
 if __name__ == "__main__":
     ants_flow = AntsFlow()
 
-    # adding ants to simulation
+    # simulation
     ants_flow.simulate()
+    # evaluation
     ants_flow.eval()
