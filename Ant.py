@@ -154,12 +154,12 @@ class Ant:
         for ant_j in near_ants:
             pos_ant_j = np.array(ant_j.pos_v)
             diff = pos_ant_i - pos_ant_j
-            if diff != 0:
+            if diff.all() != 0:
                 desired_v = desired_v + diff/abs(diff)
 
         # tener en cuenta la preferencia direccional
         pref = desired_v + self.pref_weighting*pref_v
-        if pref != 0:
+        if pref.all() != 0:
             desired_v = pref/abs(pref)
 
         equal_arrays = (desired_v == dir_v).all()
