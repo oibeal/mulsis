@@ -7,6 +7,8 @@ class Grapher:
         self.min_time = min_time
         self.mean_vel_return = {} # diccionario { time_step : mean_vel }
         self.mean_vel_leave = {} # diccionario { time_step : mean_vel }
+        self.mean_dist_leave = {}
+        self.mean_dist_return = {}
 
     def add_mean_vel_leave(self, mean_vel, time_step):
         if time_step >= self.min_time: 
@@ -15,6 +17,14 @@ class Grapher:
     def add_mean_vel_return(self, mean_vel, time_step):
         if time_step >= self.min_time:
             self.mean_vel_return[time_step] = mean_vel
+
+    def add_mean_dist_leave(self, mean_dist, time_step):
+        if time_step >= self.min_time: 
+            self.mean_dist_leave[time_step] = mean_dist
+
+    def add_mean_dist_return(self, mean_dist, time_step):
+        if time_step >= self.min_time:
+            self.mean_dist_return[time_step] = mean_dist
 
     def eval_mean_vel(self):
         mean_vel_leave = self.mean_vel_leave.values()
@@ -34,3 +44,24 @@ class Grapher:
         
         # function to show the plot
         plt.show()
+
+    def eval_mean_dist(self):
+        mean_dist_leave = self.mean_dist_leave.values()
+        mean_dist_return = self.mean_dist_return.values()
+        time_steps = self.mean_vel_return.keys()
+
+        # plotting the points
+        plt.plot(time_steps, mean_dist_leave, label="Ants leaving")
+        plt.plot(time_steps, mean_dist_return, label="Ants returning")
+
+        # naming the x axis
+        plt.xlabel('Time (s)')
+        # naming the y axis
+        plt.ylabel('Mean distance from the centre (cm)')
+        # showing the legend
+        plt.legend()
+        
+        # function to show the plot
+        plt.show()
+
+    

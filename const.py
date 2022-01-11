@@ -23,8 +23,8 @@ DESVIACION_ERROR_SATURACION = 0.5 # desviacion estandar de los giros
 MEDIA_GIROS = 0
 DESVIACION_GIROS = 0.5 # desviacion estandar de los giros
 
-N_HORMIGAS = 75 # cantidad de hormigas de la simulación
-T_MAX = 3000 # (s)
+N_HORMIGAS = 50 # cantidad de hormigas de la simulación
+T_MAX = 500 # (s)
 
 PREF_LEAVE = 0
 PREF_RETURN = 1

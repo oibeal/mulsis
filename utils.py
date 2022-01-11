@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 def rotate_vector(vector, angle):
     angle = math.radians(angle)
@@ -34,6 +35,46 @@ def coords_within_arc(pos_cir, pos_obj, r, anglemax, anglemin):
     return inside
 
 def angle_btw_2_points(pointA, pointB):
-  changeInX = pointB[0] - pointA[0]
-  changeInY = pointB[1] - pointA[1]
-  return math.degrees(math.atan2(changeInY,changeInX))
+    a = np.array(pointA)
+    b = np.array(pointB)
+    angle = calculate_rotation_angle_from_vector_to_vector(a,b)
+    if angle > 180:
+        angle -= 360
+
+    return angle
+
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    all_zero = True
+    i = 0
+    while i < len(vector) and all_zero:
+        if vector[i] != 0:
+            all_zero = False
+        
+        i += 1
+
+    if all_zero:
+        return [0, 0]
+    
+    return vector / np.linalg.norm(vector)
+
+def calculate_rotation_angle_from_vector_to_vector(a,b):
+    """ return rotation angle from vector a to vector b, in degrees.
+    Args:
+        a : np.array vector. format (x,y)
+        b : np.array vector. format (x,y)
+    Returns:
+        angle [float]: degrees. 0~360
+    """
+    unit_vector_1 = unit_vector(a)
+    unit_vector_2 = unit_vector(b)
+    dot_product = np.dot(unit_vector_1, unit_vector_2)
+    angle = np.arccos(dot_product)
+    angle = angle/ np.pi * 180
+    c = np.cross(b,a)
+    if c>0:
+        angle +=180
+    
+    return angle
+
+    

@@ -49,6 +49,9 @@ class Ant:
     def preference(self):
         return self._preference
 
+    def get_distance_from_centre(self):
+        return self.pos_v[1]
+
     def update_preference(self, pref):
         self._preference = pref
         if pref == PREF_LEAVE:
@@ -167,20 +170,18 @@ class Ant:
             # rotar hacia el v deseado para evitar a las hormigas
             angle = angle_btw_2_points(dir_v, desired_v)
             turn_per_time = self.turn_rate_avoid*T_STEP
-            if angle > 0:
-                if dir_v[0] >= 0:
+            if angle >= 0:
+                # if dir_v[0] >= 0:
                     turn_angle = min(turn_per_time, angle)
-                else:
-                    turn_angle = max(-turn_per_time, -angle)
-            elif angle < 0:
-                if dir_v[0] >= 0:
-                    turn_angle = max(-turn_per_time, -angle)
-                else:
-                    turn_angle = min(turn_per_time, angle)
+                # else:
+                #     turn_angle = max(-turn_per_time, -angle)
             else:
-                turn_angle = 0
+                # if dir_v[0] >= 0:
+                    turn_angle = max(-turn_per_time, angle)
+                # else:
+                #     turn_angle = min(turn_per_time, angle)
 
             # error = np.random.normal(MEDIA_GIROS, DESVIACION_GIROS)
             # turn_angle += math.degrees(error)
-            new_dir_v = rotate_vector(self.dir_v, turn_angle)
+            new_dir_v = rotate_vector(dir_v, turn_angle)
             self.dir_v = new_dir_v
